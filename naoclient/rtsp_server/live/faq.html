@@ -1,0 +1,1186 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<Title>Frequently Asked Questions (FAQ) about the "LIVE555 Streaming Media" libraries</Title>
+<meta name="keywords" content="streaming media, embedded systems, RTP, RTCP, RTSP, SIP, VOIP, IP television, multicast, MP3, H.264, MPEG, IP Multicast, MBone">
+</head>
+
+<body background="../graphics/lni_background.jpg">
+<H1>
+Frequently Asked Questions (FAQ) about the "<a HREF="./">LIVE555 Streaming Media</a>" libraries
+</H1>
+
+<h3>General questions</h3>
+<ol>
+<li><a HREF="#control-flow">
+What is the typical control flow within an application
+that uses these libraries, and what is the role of
+the various "Source" and "Sink" classes in the "liveMedia" library?
+</a>
+
+<li><a HREF="#custom">
+How can I use this code within a specialized environment
+(such as an embedded system, or a GUI toolkit)? 
+</a>
+
+<li><a HREF="#threads">
+Is this code 'thread safe'?  I.e., can it be accessed by more than one thread
+at the same time?
+</a>
+
+<li><a HREF="#scalability">
+How many concurrent connections/streams can a RTSP server (built using our code) support?
+</a>
+
+<li><a HREF="#packet-loss">
+When I use a receiver application
+(that uses the "LIVE555 Streaming Media" code)
+to receive an incoming RTP/UDP (or raw-UDP) stream,
+I see significant network packet loss.
+Can anything be done to improve this?
+</a>
+<!--
+<li><a HREF="#gcc-3.x">
+When I tried compling the code with "gcc" version 3.<em>&lt;something&gt;</em>,
+it complained about "strstream.h" not being found.  How can I fix this?
+</a>
+-->
+<li><a HREF="#doc">
+Is there any more documentation for these libraries?
+</a>
+
+<li><a HREF="#support">
+I would like to see new feature <em>X</em>
+added to the code.
+How soon can you do this for me?
+</a>
+</ol>
+
+<h3>Questions about the test programs (and using their code as a model for your own applications)</h3>
+<ol>
+<li><a HREF="#openRTSP-empty-files">
+When I try to receive a stream using the "openRTSP" command-line client,
+the RTSP protocol exchange appears to work OK, but the resulting data file(s) are empty.
+What's wrong?
+</a>
+
+<li><a HREF="#liveInput">
+The "test*Streamer" test programs read from a file.
+Can I modify them so that they take input from
+a H.264 or MPEG encoder instead,
+so I can stream live
+(rather than prerecorded)
+video and/or audio?
+</a>
+
+<li><a HREF="#liveInput-unicast">
+But what about the "testOnDemandRTSPServer" test program
+(for streaming via <em>unicast</em>)?
+How can I modify <em>it</em> so that it takes input
+from a live source instead of from a file?
+</a>
+
+<li><a HREF="#stb">
+Can the RTSP server implementation (e.g., as demonstrated by the
+"testOnDemandRTSPServer" test program)
+stream to set-top boxes (STBs)?
+</a>
+
+<li><a HREF="#trick-mode">
+Does the RTSP implementation (client and/or server) support
+'trick mode' operations (i.e., seek, fast-forward, reverse play)?
+</a>
+
+<li><a HREF="#unicast">
+The "test*Streamer" and "test*Receiver" test programs
+use multicast.
+Can I modify them to use unicast instead?
+</a>
+
+<li><a HREF="#rtsp-needed">
+For many of the "test*Streamer" test programs, the built-in RTSP server is optional (and disabled by default).
+For "testAMRudioStreamer", "testMPEG4VideoStreamer", "testH264VideoStreamer" and "testWAVAudioStreamer", however,
+the built-in RTSP server is mandatory.  Why?
+</a>
+
+<li><a HREF="#m4e-file">
+Where can I find an example of a MPEG-4 Elementary Stream video file
+that I can use (as "test.m4e") in the "testMPEG4VideoStreamer"
+or "testOnDemandRTSPServer" demo applications (or "live555MediaServer")?
+</a>
+
+<li><a HREF="#264-file">
+Where can I find an example of a H.264 Elementary Stream video file
+that I can use (as "test.264") in the "testH264VideoStreamer"
+or "testOnDemandRTSPServer" demo applications (or "live555MediaServer")?
+</a>
+
+<li><a HREF="#aac-file">
+Where can I find an example of a AAC Audio (ADTS format) file
+that I can use (as "test.aac") in the
+"testOnDemandRTSPServer" demo application (or "live555MediaServer")?
+</a>
+
+<li><a HREF="#jpeg-streaming">
+How can I stream JPEG video via RTP?
+There is no demo application for this.
+</a>
+
+<!--
+<li><a HREF="#select-no-error">
+When I run one of the demo applications, I get the following error:
+"BasicTaskScheduler::SingleStep(): select() fails: No error".
+What's wrong?
+</a>
+-->
+
+<li><a HREF="#mpeg-program-stream">
+When I ran "testMPEG1or2VideoStreamer", I saw several
+error messages like "saw unexpected code 0x000001e0".
+What's wrong?
+</a>
+
+<li><a HREF="#quicktime-player-mp3-bug">
+When I stream a MP3 file
+(using "testMP3Streamer" or "testOnDemandRTSPServer"),
+I find that QuickTime Player will not play the stream.
+What's wrong?
+</a>
+
+<li><a HREF="#exiting-event-loop">
+The calls to "doEventLoop()" in the test programs do not return.
+How can I arrange for "doEventLoop" to return
+- e.g., if the user clicks on a "stop" button in a GUI?
+</a>
+
+<li><a HREF="#other-kinds-of-event">
+The event loop implementation provided in the source code (i.e., "BasicTaskScheduler")
+can handle file/socket I/O events, or delayed (or periodic) tasks.
+How can I have the event loop handle other kinds of event (perhaps signaled from a separate thread)?
+</a>
+
+<li><a HREF="#my-file-doesnt-work">
+I tried using one of the test programs to stream my file,
+but it didn't work.  Why?
+</a>
+
+<li><a HREF="#my-modification-broke">
+The test programs worked OK for me, but then I modified one of them,
+and it no longer works.
+What's wrong?
+</a>
+</ol>
+
+<h3>Questions about the libraries' source code</h3>
+
+<ol>
+<li><a HREF="#latest-version">
+Where is the latest version of the library code?  What version of the library do I currently have?
+</a>
+
+<li><a HREF="#modifying-and-extending">
+What is the best way to modify or extend the functionality of the code?
+</a>
+
+<li><a HREF="#cannot-subclass">
+I want to subclass one of the supplied C++ classes, but I can't because some definitions that I need are
+"private:" rather than "protected:".
+What can I do about this?
+</a>
+
+<li><a HREF="#old-versions">
+Do you make available or support old versions of the library?
+</a>
+
+<li><a HREF="#no-source-code-repository">
+Why do you not make the code available under a 'source code repository'?
+</a>
+</ol>
+
+<h3>Questions about RTP, RTSP, and/or SIP</h3>
+
+<ol>
+<li><a HREF="#payload-format-not-supported">
+I tried to play a "rtsp://" URL (using testRTSPClient, openRTSP, VLC, or MPlayer),
+or a "sip:" URL (using playSIP),
+but I got
+an error message
+"RTP payload format unknown or not supported".
+Why?
+</a>
+
+<li><a HREF="#separate-rtp-streams">
+Why do most RTP sessions use separate streams for audio and video?
+How can a receiving client synchronize these streams?
+</a>
+
+<li><a HREF="#rtcp-synchronization-issue">
+But I notice that there's an abrupt change in a stream's presentation times after the first RTCP "SR" packet has been received.
+Is this a bug?
+</a>
+
+<li><a HREF="#general-rtp-question">
+I have a general question about RTP/RTCP, RTSP, or SIP
+- not specifically related to the LIVE555 Streaming Media software.
+Where can I get more information?
+</a>
+</ol>
+
+<h3>Questions about the "live-devel" mailing list</h3>
+
+<ol>
+<li><a HREF="#mailing-list-address">
+How do I ask questions about the "LIVE555 Streaming Media" software (including the "LIVE555 Media Server" and the "LIVE555 Proxy Server")?
+</a>
+
+<li><a HREF="#why-subscribe">
+Why do I need to subscribe to the mailing list before I can send to it?
+</a>
+
+<li><a HREF="#moderation">
+When I posted a message to the mailing list, I received a response saying that my message was being moderated.  Why?
+</a>
+
+<li><a HREF="#unprofessional-email-addresses">
+Why do you discriminate against people who use unprofessional email addresses ("@gmail.com" etc.)?
+</a>
+
+<li><a HREF="#why-no-answer">
+Why did nobody answer my question?
+</a>
+
+<li><a HREF="#reposting">
+I posted a question to the mailing list, but nobody answered it.  Can I post it again?
+</a>
+</ol>
+
+<p><IMG  WIDTH="531" HEIGHT="6" SRC="../graphics/separator.gif" alt="-----"><p>
+
+<a name="control-flow"></a>
+<h2>
+What is the typical control flow within an application
+that uses these libraries, and what is the role of
+the various "Source" and "Sink" classes in the "liveMedia" library?
+</h2>
+
+Applications are event-driven, using an event loop
+"<a HREF="./doxygen/html/classTaskScheduler.html">TaskScheduler::doEventLoop()</a>"
+that works basically
+as follows:
+<pre>
+    while (1) {
+        find a task that needs to be done (by looking on the delay queue,
+                and the list of network read handlers);
+        perform this task;
+    }
+</pre>
+Also, before entering this loop, applications will typically call
+<pre>
+    <a HREF="doxygen/html/classMediaSink.html"><em>someSinkObject</em>->startPlaying();</a>
+</pre>
+for each sink, to start generating tasks that need to
+be done.
+
+<p>
+Data passes through a chain of 'source's and 'sink's - e.g.,
+<pre>
+    'source1' -> 'source2' (a filter) -> 'source3' (a filter) -> 'sink'
+</pre>
+(Sources that receive data from other sources are also called "filters".)
+<p>
+Whenever a object (a 'sink' or one of the intermediate filter 'source's)
+wants to get more data, it calls
+"<a HREF="doxygen/html/classFramedSource.html">FramedSource::getNextFrame()</a>"
+on the
+object that's to its immediate left.  This is implemented by the pure
+virtual function
+"<a HREF="doxygen/html/classFramedSource.html">FramedSource::doGetNextFrame()</a>",
+that is implemented by each 'source' object.
+<p>
+Each 'source' object's implementation of "doGetNextFrame()" works by
+arranging for an 'after getting' function to be called
+(from an event handler)
+when new data becomes available for the caller.
+<p>
+Note that the flow of data from 'sources' to 'sinks' happens
+<em>within</em> each application, and doesn't correspond
+to the sending or receiving of network packets.
+For example, a server application
+(such as "testMP3Streamer" or "testOnDemandRTSPServer") that transmits RTP packets will do so
+using one or more "RTP<em>Sink</em>" objects.
+Each "RTPSink" object will receive data from
+a chain of other, 'source' or 'filter' objects (e.g., to read data from a file), and, as a side
+effect, transmit RTP packets.
+Similarly, a client application
+(such as "testMP3Receiver" or "openRTSP") that receives RTP packets will do so
+using one or more "RTP<em>Source</em>" objects.
+Each "RTPSource" object will receive RTP packets from the network,
+and pass the network data (without network headers) through a chain of
+(zero or more) 'filter' objects,
+ending with a 'sink' object that processes the data
+- e.g., by writing it to a file ("FileSink"),
+or by decoding and rendering the audio or video data.
+
+<p><hr><p><a name="custom"></a>
+<h2>
+How can I use this code within a specialized environment
+(such as an embedded system, or a GUI toolkit)? 
+</h2>
+
+People usually do this by developing their own subclasses of the
+"<a HREF="./doxygen/html/classUsageEnvironment.html">UsageEnvironment</a>"
+and
+"<a HREF="doxygen/html/classTaskScheduler.html">TaskScheduler</a>"
+abstract base classes (see
+"<a HREF="./doxygen/html/UsageEnvironment_8hh-source.html">UsageEnvironment/include/UsageEnvironment.hh</a>").
+Note that the released
+source code includes one particular implementation of these classes: the
+"BasicUsageEnvironment" library.  This uses the Unix (or Windows) console
+for I/O, and so allows you to develop applications that you can run in a
+conventional console environment
+- e.g., for prototyping and debugging.
+Then, by using
+your own custom subclasses of "UsageEnvironment" and (perhaps) "TaskScheduler" (i.e.,
+instead of "BasicUsageEnvironment" and "BasicTaskScheduler"), the same
+code will run, unchanged, in your custom environment.
+<p>
+In particular, to use the code within a GUI toolkit, your "TaskScheduler"
+subclass's implementation of "doEventLoop()" should be integrated with the
+GUI toolkit's own event handling mechanism.
+
+<p><hr><p><a name="threads"></a>
+<h2>
+Is this code 'thread safe'?  I.e., can it be accessed by more than one thread
+at the same time?
+</h2>
+
+<em>Short answer:</em>
+No.  As noted
+<a HREF="#control-flow">above</a>,
+the code assumes a single thread of execution,
+using an event
+loop - rather than multiple threads - for concurrency.
+This generally makes the code much easier to debug, and much easier
+to port across multiple operating systems, which may have different
+thread APIs, or no thread support at all.
+<small>(For even stronger arguments along these same lines,
+see <a HREF="http://www.softpanorama.org/People/Ousterhout/Threads/tsld001.htm">John Ousterhout's presentation</a>.)
+</small>
+
+<p>
+<em>Longer answer:</em>
+More than one thread can still use this code, if only one thread
+runs the library code proper, and the other thread(s) communicate with the
+library only by setting global 'flag' variables
+(such as event loop '<a HREF="#exiting-event-loop">watch variables</a>'),
+or by calling '<a HREF="#other-kinds-of-event">event triggers</a>'.
+(Note that "<a HREF=""http://www.live555.com/liveMedia/doxygen/html/classTaskScheduler.html">triggerEvent()</a>" is the
+<em>only</em> LIVE555 function that may be called from an external (i.e., non-LIVE555) thread.)
+<p>
+Another possible way to access the code from multiple threads is to have each
+thread use its own "UsageEnvironment" and "TaskScheduler" objects,
+and thus its own event loop.
+The objects created by each thread (i.e., using its own "UsageEnvironment")
+must not interact (except via global variables).
+Such a configuration is not recommended, however; instead, it is safer to structure such an application as multiple
+<em>processes</em>, not multiple threads.
+
+<p>
+In any case,
+when using the "LIVE555 Streaming Media" code, you should be familiar with event-driven programming, and understand that an event-driven application can perform at least as well as one that uses threads (unless you're actually running on a multiprocessor, in which case it's usually simpler to have your application consist of multiple processes (not just threads) - one running on each processor).  Note, in particular, that you
+<em>do not</em> need multiple threads in order to transmit (or receive) multiple streams concurrently.
+
+<p><hr><p><a name="scalability"></a>
+<h2>
+How many concurrent connections/streams can a RTSP server (built using our code) support?
+</h2>
+
+There's no fixed limit in our code.  In practice, however, the number of open files (sockets) supported by the underlying operating system often sets a limiting factor.  If you can increase this number (in your operating system), then this sometimes can increase scalability.
+
+<p><small>
+In Windows, there is also a limit set by the "FD_SETSIZE" constant, which has a default value of 64, which produces a maximum of 32 concurrent clients.
+You might also wish to increase this value - e.g., by redefining FS_SETSIZE at compile time.
+</small>
+
+<p><hr><p><a name="packet-loss"></a>
+<h2>
+When I use a receiver application
+(that uses the "LIVE555 Streaming Media" code)
+to receive an incoming RTP/UDP (or raw-UDP) stream,
+I see significant network packet loss.
+Can anything be done to improve this?
+</h2>
+
+First, you should make sure that your network has sufficient bandwidth for your data stream.
+<p>
+However, packet loss can also
+be caused by insufficiently large socket reception buffers in the receiver's operating system.
+By default, the
+"LIVE555 Streaming Media"
+code asks the operating system to allocate at least 50 kBytes of buffer memory for each incoming datagram socket.
+(Note the call to <em>increaseReceiveBufferTo()</em> in "liveMedia/MultiFramedRTPSource.cpp".)
+However, you can also ask to increase this buffer size, by calling <em>increaseReceiveBufferTo()</em> again, within your own application code.
+(Note that <em>increaseReceiveBufferTo()</em> returns the actual resulting socket buffer size, reported by the OS, so you can
+check the return value to verify the resulting buffer size.)
+<p><small>
+<ul>
+<li>Note, for example, the code for the
+<a HREF="http://www.videolan.org/vlc/">VLC media player</a>, which sets the OS's internal receive
+buffer to 2,000,000 bytes for the video stream, and 100,000 bytes for the audio stream - see "modules/demux/live555.cpp".
+<li>Note: If you are using the Linux OS, you might first need to set the OS's maximum buffer size, before you call
+<em>increaseReceiveBufferTo()</em>.  You do this by running (as root):
+<pre>
+    sysctl net.core.rmem_max = <em>the_maximum_buffer_size_that_you_need</em>
+</pre>
+</ul>
+</small>
+
+<p>
+It's important to understand that because a LIVE555 Streaming Media application runs as a single thread
+- never writing to, or reading from, sockets concurrently -
+if packet loss occurs, then it <em>must</em> be happening either (i) on the network,
+or (ii) in the operating system of the sender or receiver.  There's nothing in our code that can be 'losing' packets.
+
+<!--
+<p><hr><p><a name="gcc-3.x"></a>
+<h2>
+When I tried compling the code with "gcc" version 3.<em>&lt;something&gt;</em>,
+it complained about "strstream.h" not being found.  How can I fix this?
+</h2>
+
+See the note
+"<strong>If you're using "gcc" version 3.0 or greater</strong>"
+in the
+<a HREF="http://www.live555.com/liveMedia/#config-unix">Unix build instructions</a>.
+You can use the file "strstream" instead of "strstream.h", e.g., by
+making "strstream.h" a symbolic link to "strstream".
+-->
+<p><hr><p><a name="doc"></a>
+<h2>
+Is there any more documentation for these libraries?
+</h2>
+
+The best way to understand how to use the libraries is to (i) study the example programs in the "testProgs" directory, (ii) study the library code itself, and
+(iii) ask questions on the
+"<a HREF="http://lists.live555.com/mailman/listinfo/live-devel/">live-devel</a>"
+mailing list.
+(You may also find the
+<a HREF="./doxygen/html/">'Doxygen' source code documentation</a>
+- in particular, the
+<a HREF="./doxygen/html/classMedium.html">"Medium" class hierarchy</a> -
+useful.)
+
+<p><hr><p><a name="support"></a><h2>
+I would like to see new feature <em>X</em>
+added to the code.
+How soon can you do this for me?
+</h2>
+
+The highest-priority features are those that have been requested by
+paying consulting clients.
+If your company is interested in providing funding for the 
+development of a particular feature,
+please email "support<em>(at)</em>live555.com".
+
+<p><IMG  WIDTH="531" HEIGHT="6" SRC="../graphics/separator.gif" alt="-----"><p>
+
+<a name="openRTSP-empty-files"></a><h2>
+When I try to receive a stream using the
+"<a HREF="../openRTSP/">openRTSP</a>" command-line client,
+the RTSP protocol exchange appears to work OK, but the resulting data file(s) are empty.
+What's wrong?
+</h2>
+
+RTP/UDP media (audio and/or video) packets from the server are not reaching the client, most likely because there is a firewall somewhere
+inbetween that is blocking UDP packets.
+(Note that the RTSP protocol uses TCP, not UDP.)
+To correct this, either fix your firewall, or else request RTP-over-TCP streaming, using the "-t" option to "openRTSP".
+
+<a name="liveInput"></a><h2>
+The "test*Streamer" test programs read from a file.
+Can I modify them so that they take input from
+a H.264 or MPEG encoder instead,
+so I can stream live
+(rather than prerecorded)
+video and/or audio?
+</h2>
+
+Yes.
+The easiest way to do this is to change the appropriate
+"test*Streamer.cpp" file
+to read from "stdin" (instead of "test.*"),
+and then pipe the output of your encoder to (your modified) "test*Streamer" application.
+(Even simpler, if your operating system represents the MPEG input device as
+a file, then you can just use the name of this file (instead of "test.*").)
+<p>
+Alternatively, if your encoder
+presents you with a sequence of frames, rather than a sequence of bytes, then
+a more efficient solution would be to 
+write your own
+"<a HREF="doxygen/html/classFramedSource.html">FramedSource</a>"
+subclass that encapsulates your encoder,
+and delivers audio or video frames directly to
+the appropriate "*RTPSink" object.
+This avoids the need for an intermediate 'framer' filter that parses the input byte stream.
+<small>(If, however, you are streaming H.264, or MPEG-4 (or MPEG-2 video with "B" frames), then you should
+insert the appropriate "*<em>Discrete</em>Framer" filter
+between your source object and your "*RTPSink" object.)</small>
+<p>
+For a model of how to do that, see
+"<a HREF="./doxygen/html/DeviceSource_8cpp-source.html">liveMedia/DeviceSource.cpp</a>"
+(and
+"<a HREF="./doxygen/html/DeviceSource_8hh-source.html">liveMedia/include/DeviceSource.hh</a>").  You will need to fill in parts of this code to do the actual reading from your encoder.
+
+<p><hr><p><a name="liveInput-unicast"></a><h2>
+But what about the "testOnDemandRTSPServer" test program
+(for streaming via <em>unicast</em>)?
+How can I modify <em>it</em> so that it takes input
+from a live source instead of from a file?
+</h2>
+
+First, you will need to modify
+"<a HREF="./doxygen/html/testOnDemandRTSPServer_8cpp-source.html">testProgs/testOnDemandRTSPServer.cpp</a>"
+to set the variable "reuseFirstSource" to "True".
+This tells the server to use the same input source object, even if
+more than one client is streaming from the server concurrently.
+<p>
+Then, as above, if your input device is accessible by a file name (including
+"stdin" for standard input), then simply replace the
+appropriate "test.*" file name with the file name of your input device.
+<p>
+If, however, you have written your own "FramedSource" subclass
+(e.g., based on "DeviceSource", as noted above)
+to encapsulate your input source, then
+the solution is a little more complicated.
+In this case, you will also need to define and implement your own new
+subclass of
+"<a HREF="./doxygen/html/classOnDemandServerMediaSubsession.html">OnDemandServerMediaSubsession</a>"
+that gets its input from your live source, rather than from a file.
+In particular, you will need to provide your own implementation of the two
+pure virtual functions
+"createNewStreamSource()" and "createNewRTPSink()".
+For a model of how to do this, see the existing
+"<a HREF="./doxygen/html/classFileServerMediaSubsession.html">FileServerMediaSubsession</a>"
+subclass that is used to stream your desired type of data from an input file. 
+(For example, if you are streaming H.264 video, you would use
+"<a HREF="./doxygen/html/classH264VideoFileServerMediaSubsession.html">H264VideoFileServerMediaSubsession</a>"
+as a model.)
+Note that:
+<ul>
+<li>Your "createNewStreamSource()" implementation will create (and return) an
+instance of your input source object.
+(You should also set the "estBitrate" result parameter to be the estimated
+bit rate (in kbps) of the stream.
+This estimate is used to determine the frequency of RTCP packets;
+it is not essential that it be accurate.)
+
+<li>Your "createNewRTPSink()" implementation will create (and return)
+an appropriate new
+"<a HREF="./doxygen/html/classRTPSink.html">RTPSink</a>"
+(subclass) object.
+(The code for this will usually be the same as the code for
+"createNewRTPSink()"
+in the corresponding "FileServerMediaSubsession" subclass.)
+</ul>
+
+<p><hr><p><a name="stb"></a><h2>
+Can the RTSP server implementation (e.g., as demonstrated by the
+"testOnDemandRTSPServer" test program)
+stream to set-top boxes (STBs)?
+</h2>
+
+Yes, our RTSP server implementation can, in principle,
+stream to RTSP-compliant STBs.
+In practice, however, there are some issues to note:
+<ul>
+<li>Many (most?) STBs do not support RTP; instead, they handle
+streams of raw-UDP packets.
+There is currently no standard way to use the RTSP protocol to request raw-UDP
+streams, so different STB (and server) manufacturers tend to define
+their own (often incompatible) RTSP extensions for this.
+<li>STBs typically handle only MPEG Transport Streams,
+not Elementary Streams or other data formats.
+(Because MPEG Transport Streams contain their own timestamps, they can be streamed
+via raw-UDP, with RTP timestamps not being required.)
+<li>Some STBs do not handle multicast streams.
+</ul>
+However, our RTSP server implementation
+(and, in particular, the
+"<a HREF="../mediaServer/">LIVE555 Media Server</a>"
+and the
+"testOnDemandRTSPServer" demo application)
+can stream MPEG Transport Stream data
+(with <a HREF="./transport-stream-trick-play.html">'trick play' support</a>)
+to
+<a HREF="http://www.aminocom.com/">Amino</a>
+STBs (in particular, the AmiNet model 103 and 110).
+Note that, for this to work, the STB's RTSP client software
+must be configured to use "nCube" mode (the default?),
+<em>not</em> "Oracle" or "Mediabase" mode. 
+Also (as noted above), the input source (to the RTSP server)
+must be a MPEG-2 Transport Stream.
+
+<p><hr><p><a name="trick-mode"></a><h2>
+Does the RTSP implementation (client and/or server) support
+'trick mode' operations (i.e., seek, fast-forward, reverse play)?
+</h2>
+
+When talking about "trick mode support", it's important to distinguish between RTSP <em>client</em> support,
+and RTSP <em>server</em> support.
+<p>
+Our <a HREF="./doxygen/html/classRTSPClient.html">RTSP client implementation</a>
+fully supports 'trick play' operations.
+Note the "start", "end" and "scale" parameters to 
+"RTSPClient::sendPlayCommand()".
+(Note also that our
+"<a HREF="../openRTSP/">openRTSP</a>"
+demo RTSP client application has command-line options that can be used to demonstrate client 'trick play' operations.)
+<p>
+Our <a HREF="./doxygen/html/classRTSPServer.html">RTSP server implementation</a>
+also supports 'trick play' operations,
+but note that parts of this are (necessarily) media type 
+specific.  I.e., there has to be some new code added for each different 
+type of media file that we wish to stream.
+This functionality has already been provided for
+<a HREF="../mediaServer/#trick-play">some types of media file</a>.
+<p>
+To add 'trick play' support for a media type (that does not already support it),
+changes need to be made to the corresponding subclass of 
+"<A HREF="./doxygen/html/classServerMediaSession.html">ServerMediaSubsession</a>":
+<ol>
+<li>To add support for seeking within a stream, you will need to implement 
+the following virtual functions:
+<ul>
+<li><pre>virtual float duration() const;</pre>
+Returns the file's duration, in seconds
+<li><pre>virtual void seekStreamSource(FramedSource* inputSource, float seekNPT);</pre>
+(Attempts to) seek within the input source.
+</ul>
+<li>To add support for 'fast forward' and/or 'reverse play', you will also 
+need to implement the following virtual functions:
+<ul>
+<li><pre>virtual void testScaleFactor(float& scale);</pre>
+Inspects the input value of "scale", and, if necessary, changes it to a 
+nearby value that we support.  (E.g., if the input value of "scale" is 3.3, 
+you might change it to 3 (an integer).)  If there's no 'nearby' value that 
+you support, just set "scale" to 1 (the default value).
+<li><pre>virtual void setStreamSourceScale(FramedSource* inputSource, float scale);</pre>
+Actually sets the scale factor for a specific input source.  (The value 
+of "scale" will previously have been passed in and out of 
+"testScaleFactor()", so we know that it is a value that we support.)
+</ul>
+</ol>
+
+<p><hr><p><a name="unicast"></a><h2>
+The "test*Streamer" and "test*Receiver" test programs
+use multicast.
+Can I modify them to use unicast instead?
+</h2>
+
+Yes, you can do this, but you should first convince yourself
+that this is something that you
+<em>really</em>
+want to do.
+If you're streaming over a LAN, then you should continue to use
+multicast - it's simpler, and allows more than one receiver to
+access the stream, without data duplication.
+The only time you should consider using unicast is
+if you are streaming over
+a wider-area network that does not support multicast routing.
+(Note also that the RTSP server that's built in to the "test*Streamer"
+programs <em>does not</em> work with unicast streams.
+To play unicast streams from a RTSP server, you should instead use the
+existing
+<a HREF="./#testProgs">"testOnDemandRTSPServer" test program</a>
+or the
+"<a HREF="../mediaServer/">LIVE555 Media Server</a>"
+as a model.
+This is usually better than trying to modify one of the
+"test*Streamer" applications.)
+<p>
+If you still wish to change the "test*Streamer" programs to stream
+using unicast, then do the following:
+<ol>
+<li>In "test*Streamer.cpp", change "destinationAddressStr" to the
+(unicast) IP address of the intended destination.
+<li>In the corresponding "test*Receiver.cpp", change "sessionAddressStr"
+to "0.0.0.0".
+<li>(optional)
+If you also want to send RTCP packets (e.g., RTCP Receiver Reports)
+<em>back</em> to the streaming server,
+then you will also need to do the following
+- in "test*Receiver.cpp" -
+after you've created "rtcpGroupsock".
+(In this example, suppose that the streaming server has IP address "10.20.30.40" and uses port 6667 for RTCP.):
+<pre>
+    struct in_addr serverAddress;
+    serverAddress.s_addr = our_inet_addr("10.20.30.40");
+    rtcpGroupsock.changeDestinationParameters(serverAddress, 6667, 255);
+</pre>
+</ol>
+
+<p><hr><p><a name="rtsp-needed"></a><h2>
+For many of the "test*Streamer" test programs, the built-in RTSP server is optional (and disabled by default).
+For "testAMRudioStreamer", "testMPEG4VideoStreamer", "testH264VideoStreamer" and "testWAVAudioStreamer", however,
+the built-in RTSP server is mandatory.  Why?
+</h2>
+
+For those media types (AMR audio, MPEG-4 video, and PCM audio, respectively), the stream includes some
+codec-specific parameters that are communicated to clients out-of-band, in a SDP description.
+Because these parameters - and thus the SDP description - can vary from stream to stream, the only effective
+way to communicate this SDP description to clients is using the standard RTSP protocol.
+Therefore, the RTSP server is a mandatory part of these test programs.
+
+<p><hr><p><a name="m4e-file"></a><h2>
+Where can I find an example of a MPEG-4 Elementary Stream video file
+that I can use (as "test.m4e") in the "testMPEG4VideoStreamer"
+or "testOnDemandRTSPServer" demo applications (or "live555MediaServer")?
+</h2>
+
+One way to get a MPEG-4 Video Elementary Stream file is to find a public MPEG-4 RTSP/RTP stream, and then run "openRTSP" on it.
+<p>
+If you search in an online search engine for
+<pre>
++"rtsp://" +".mp4"
+</pre>
+then you may find some "rtsp://" URLs for streams that contain MPEG-4 video content.
+You can try receiving some of these using "openRTSP"
+(add the "-t" option if you're behind a firewall).
+<p>
+This should give you two files: "video-MP4V-ES-1" and "audio-MPEG4-GENERIC-2".
+(If, instead, you get a file "video-H264-1", then this is H.264 video, not MPEG-4
+video.  Try again with another stream.)
+Rename the file "video-MP4V-ES-1" as "test.m4e", and you will be able to use it in "testMPEG4VideoStreamer" and "testOnDemandRTSPServer".
+<p>
+We have also made some example MPEG-4 Video Elementary Stream (".m4e") files available online
+<a HREF="http://www.live555.com/liveMedia/public/m4e/">here</a>.
+
+<p><hr><p><a name="264-file"></a><h2>
+Where can I find an example of a H.264 Elementary Stream video file
+that I can use (as "test.264") in the "testH264VideoStreamer"
+or "testOnDemandRTSPServer" demo applications (or "live555MediaServer")?
+</h2>
+
+As noted in the answer to the previous question,
+you may be able to find some "rtsp://" URLs for online streams that contain H.264 video content.
+You can then use "openRTSP" to record a portion of these streams.
+<p>
+We have also made some example H.264 Video Elementary Stream (".264") files available online
+<a HREF="http://www.live555.com/liveMedia/public/264/">here</a>.
+
+<p><hr><p><a name="aac-file"></a><h2>
+Where can I find an example of a AAC Audio (ADTS format) file
+that I can use (as "test.aac") in the
+"testOnDemandRTSPServer" demo application (or "live555MediaServer")?
+</h2>
+
+We have made some example files available online
+<a HREF="http://www.live555.com/liveMedia/public/aac/">here</a>.
+
+
+<p><hr><p><a name="jpeg-streaming"></a><h2>
+How can I stream JPEG video via RTP?
+There is no demo application for this.
+</h2>
+
+See
+<a HREF="http://lists.live555.com/pipermail/live-devel/2005-January/001908.html">here</a>
+and
+<a HREF="http://lists.live555.com/pipermail/live-devel/2003-November/000037.html">here</a>.
+
+<p>
+You should be aware, though, that JPEG is a very poor codec for video streaming, because
+(unlike MPEG or H.264 video)
+there is no inter-frame compression.
+<em>Every</em> video frame is a 'key' frame, and is sent in its entirety.
+Also, each frame is typically large
+(and so takes up many network packets).
+If <em>any</em> of these network packets gets lost, then the whole frame must be discarded.
+JPEG video streaming is strongly discouraged,
+and should be considered (if at all) only for high-bitrate local-area networks with very low packet loss.
+
+<!--
+<p><hr><p><a name="select-no-error"></a><h2>
+When I run one of the demo applications, I get the following error message:
+"BasicTaskScheduler::SingleStep(): select() fails: No error".
+What's wrong?
+</h2>
+
+This message usually occurs when running an old version of Windows (prior to XP).
+These old versions of Windows do not treat open files as being "select()"able sockets,
+and so asynchronous file reading does not work on these systems.  To work around this,
+try adding:
+<pre>
+#define READ_FROM_FILES_SYNCHRONOUSLY 1
+</pre>
+to the start of "liveMedia/ByteStreamFileSource.cpp", and recompile.
+-->
+
+<p><hr><p><a name="mpeg-program-stream"></a><h2>
+When I ran "testMPEG1or2VideoStreamer", I saw several
+error messages like "saw unexpected code 0x000001e0".
+What's wrong?
+</h2>
+
+By default, "testMPEG1or2VideoStreamer" assumes that its input is a MPEG
+(1 or 2) Video <em>Elementary Stream</em> - i.e., a stream that consists
+only of MPEG video.  Your input is probably instead a MPEG
+<em>Program Stream</em> - a stream that consists of both
+video and audio, multiplexed together. You can play this stream by
+uncommenting the line
+<pre>
+    #define SOURCE_IS_PROGRAM_STREAM 1
+</pre>
+in "testMPEG1or2VideoStreamer.cpp".
+Alternatively, you could run "testMPEG1or2AudioVideoStreamer" instead of
+"testMPEG1or2VideoStreamer"
+(and thereby stream audio as well as video).
+
+<p><hr><p><a name="quicktime-player-mp3-bug"></a><h2>
+When I stream a MP3 file
+(using "testMP3Streamer" or "testOnDemandRTSPServer"),
+I find that QuickTime Player will not play the stream.
+What's wrong?
+</h2>
+
+This is a known (and longstanding) bug in QuickTime Player:
+It cannot play MP3 audio RTP streams.
+(It will play MP3 <em>files</em> OK,
+and will play MPEG layer I or layer II audio RTP streams
+- but not MPEG layer III (i.e., MP3) RTP streams.)
+<p>
+Blame Apple for this.  They have known about this bug for many years,
+but - for some odd reason - do not consider it a high priority bug.
+<p>
+Instead, we recommend that you use the
+<a HREF="http://www.videolan.org/vlc/">VLC media player</a>.
+
+<p><hr><p><a name="exiting-event-loop"></a><h2>
+The calls to "doEventLoop()" in the test programs do not return.
+How can I arrange for "doEventLoop" to return
+- e.g., if the user clicks on a "stop" button in a GUI?
+</h2>
+
+"TaskScheduler::doEventLoop()" takes an optional "watchVariable" parameter
+that can be used for this purpose.
+(By setting this variable - perhaps from an external thread - you can signal the event loop (i.e. "doEventLoop()) to exit.)
+See the definition of
+"<a HREF="doxygen/html/classTaskScheduler.html">TaskScheduler::doEventLoop()</a>"
+in the file
+"<a HREF="./doxygen/html/UsageEnvironment_8hh-source.html">UsageEnvironment/include/UsageEnvironment.hh</a>".
+
+<p><hr><p><a name="other-kinds-of-event"></a><h2>
+The event loop implementation provided in the source code (i.e., "BasicTaskScheduler")
+can handle file/socket I/O events, or delayed (or periodic) tasks.
+How can I have the event loop handle other kinds of event (perhaps signaled from a separate thread)?
+</h2>
+
+One way to do this is to use the "EventTrigger" mechanism that's defined for the
+"<a HREF="doxygen/html/classTaskScheduler.html">TaskScheduler</a>"
+class.
+This lets you define a procedure that will be called - from within the event handler - whenever your custom event is
+later 'triggered'.
+<p>
+Alternatively, you could subclass "TaskScheduler" to implement your own event loop
+- but that is more difficult.
+
+<p><hr><p><a name="my-file-doesnt-work"></a><h2>
+I tried using one of the test programs to stream my file,
+but it didn't work.  Why?
+</h2>
+
+First, are you sure that your file is of the correct type?
+(For example, if you are using "testMPEG1or2VideoStreamer", then your
+input file ("test.mpg") must be a MPEG Video Elementary Stream file.)
+<p>
+If you're sure that your file is of the correct type, then 
+<strong>please put the file on a publically-accessible web (or FTP) server,
+and post the URL
+(<em>not</em> the file itself) to the
+"<a HREF="http://lists.live555.com/mailman/listinfo/live-devel/">live-devel</a>"
+mailing list</strong>,
+and we'll take a look at it,
+to see if we can figure out what's wrong.
+
+<p><hr><p><a name="my-modification-broke"></a><h2>
+The test programs worked OK for me, but then I modified one of them,
+and it no longer works.
+What's wrong?
+</h2>
+
+Since we don't know what modifications you made, we can't tell :-)
+But remember:
+<em>You have complete source code!</em>
+You began with one of the test programs - code that already works
+- and then you modified it.
+Therefore, you should
+have all the information that you need to figure out what's wrong
+with your program.
+(Of course, if you find a genuine bug in the
+LIVE555 Streaming Media code, then please post it to
+"<a HREF="http://lists.live555.com/mailman/listinfo/live-devel/">live-devel</a>"
+mailing list.)
+
+<p><IMG  WIDTH="531" HEIGHT="6" SRC="../graphics/separator.gif" alt="-----"><p>
+
+<a name="latest-version"></a><h2>
+Where is the latest version of the library code?  What version of the library do I currently have?
+</h2>
+
+The latest version of the "LIVE555 Streaming Media" source code can be found at
+<a HREF="http://www.live555.com/liveMedia/public/">http://www.live555.com/liveMedia/public/</a>.
+Specifically, the latest version of the code is
+<a HREF="http://www.live555.com/liveMedia/public/live555-latest.tar.gz">http://www.live555.com/liveMedia/public/live555-latest.tar.gz</a>
+<p>
+To see which version of the code you currently have, look at the file "liveMedia/include/liveMedia_version.hh".
+
+<p><hr><p><a name="modifying-and-extending"></a><h2>
+What is the best way to modify or extend the functionality of the code?
+</h2>
+
+To add new functionality to the code, you should not modify the existing code (unless this is unavoidable).
+Instead, use C++ subclassing.
+Add your new subclass definitions and implementations in a separate directory
+(i.e., separate from the "live/" directory that contains the supplied source code).
+That way, you can easily upgrade to new versions of the supplied source code - simply by replacing the "live/" directory -
+without affecting your own new code.
+<p>
+Note also that subclassing the code considerably simplifies your obligations under the LGPL.
+If you modify the supplied code, and then release a product based on these modifications,
+then you are required to also make your modified source code available.
+If, instead, you subclass the supplied code (without modifying it), you are not required to make available any of your
+own source code.
+
+<p><hr><p><a name="cannot-subclass"></a><h2>
+I want to subclass one of the supplied C++ classes, but I can't because some definitions that I need are
+"private:" rather than "protected:".
+What can I do about this?
+</h2>
+
+Send an email to the
+"<a HREF="#mailing-list-address">live-devel</a>"
+mailing list, and we'll try to accommodate this in the next release of the software.
+
+<p><hr><p><a name="old-versions"></a><h2>
+Do you make available or support old versions of the library?
+</h2>
+
+No.  Because the latest version of the library code contains bug fixes and improvements,
+older versions of the code are not supported.
+Developers are expected to work with the latest version of the code.  (Fortunately, major API changes happen rarely.)
+<p>
+It's important to understand that this software - unlike some others - does not have separate 'stable' and 'experimental' releases.
+Instead, there's just one release, and it can be considered 'stable'.
+
+<p><hr><p><a name="no-source-code-repository"></a><h2>
+Why do you not make the code available under a 'source code repository'?
+</h2>
+
+There's no need for a source code repository, because old versions of the code are not supported.
+(A source code repository might also encourage developers to extend the source code by modifying it 'in place'
+(and then upgrading the code by 'merging diffs').
+As <a HREF="#modifying-and-extending">noted above</a>, modifying the supplied code 'in place'
+is something that we discourage; instead, developers should use C++ subclassing to extend the code.)
+
+<p><IMG  WIDTH="531" HEIGHT="6" SRC="../graphics/separator.gif" alt="-----"><p>
+
+<a name="payload-format-not-supported"></a><h2>
+I tried to play a "rtsp://" URL (using testRTSPClient, openRTSP, VLC, or MPlayer),
+or a "sip:" URL (using playSIP),
+but I got
+an error message
+"RTP payload format unknown or not supported".
+Why?
+</h2>
+
+The problem here is that the "liveMedia" library
+does not support the "RTP payload format" that is used to stream data
+with this particular codec.
+<p>
+An "RTP payload format" for a codec is a set of rules that define how
+the codec's media frames are packed within RTP packets.
+This is usually defined by an
+<a HREF="http://www.ietf.org/">IETF</a> RFC,
+or - for newer payload formats - an IETF Internet-Draft.
+However, a few RTP payload formats (usually those
+whose MIME subtype begins with "X-")
+are proprietary,
+are not defined in publically-available documents.
+<p>
+The "liveMedia" library supports many, but not all, RTP payload
+formats.
+If you encounter a RTP payload format that is not supported,
+but which is defined by a publically-available document,
+then we may be able to add support for it,
+if there is sufficient interest.
+
+<p><hr><p><a name="separate-rtp-streams"></a><h2>
+Why do most RTP sessions use separate streams for audio and video?
+How can a receiving client synchronize these streams?
+</h2>
+
+Sending audio and video in separate RTP streams
+provides a great deal of flexibility.
+For example, this makes it possible for a player to receive only the
+audio stream,
+but not video (or vice-versa).
+It would even be possible to have one computer receive and play audio, and a separate computer receive and play video.
+<p>
+These audio and video streams are synchronized using RTCP
+"Sender Report" (SR) packets
+- which map each stream's RTP timestamp to 'wall clock' (NTP) time.
+For more information, see the
+IETF's <a HREF="ftp://ftp.rfc-editor.org/in-notes/rfc3550.txt">RTP/RTCP specification</a>.
+<p>
+Receivers can then use this mapping to synchronize the incoming RTP streams.  The LIVE555 Streaming Media code does this automatically: For subclasses of "RTPSource", the "presentationTime" parameter that's passed to the 'afterGettingFunc' of "getNextFrame()" (see
+"<a HREF="./doxygen/html/FramedSource_8hh-source.html">liveMedia/include/FramedSource.hh</a>")
+will be an accurate, time-synchronized time.  (For this to work, you need to have also created a
+"<a HREF="./doxygen/html/classRTCPInstance.html">RTCPInstance</a>"
+for each RTP source.)
+<p>
+For example, if you use "<a HREF="../openRTSP/">openRTSP</a>" to receive RTSP/RTP streams,
+then the contents of each RTP stream (audio and video) are written into separate files.  This is done using the
+"<a HREF="./doxygen/html/classFileSink.html">FileSink</a>"
+class.  If you look at the "FileSink::afterGettingFrame()" member function, you'll notice that there's a "presentationTime" parameter for each incoming frame.
+Some other receiver could use the "presentationTime" parameter to synchronize audio and video.
+
+<p><hr><p><a name="rtcp-synchronization-issue"></a><h2>
+But I notice that there's an abrupt change in a stream's presentation times after the first RTCP "SR" packet has been received.
+Is this a bug?
+</h2>
+
+No, this is normal, and expected; there's no bug here.
+This happens because the first few presentation times - before RTCP synchronization occurs - are just 'guesses' made by the
+receiving code (based on the receiver's 'wall clock' and the RTP timestamp).
+However, once RTCP synchronization occurs, all subsequent presentation times <em>will</em> be accurate.
+<p>
+This means is that a receiver should be prepared for the fact that the first few presentation times
+(until RTCP synchronization starts) will not be accurate.
+The code, however, can check this by calling
+<em>"RTPSource:: hasBeenSynchronizedUsingRTCP()"</em>.
+If this returns False, then the presentation times are not accurate, and should not be used for synchronization.
+However, once the call to returns True, then the presentation times (from then on) will be accurate.
+
+<p><hr><p><a name="general-rtp-question"></a><h2>
+I have a general question about RTP/RTCP, RTSP, or SIP
+- not specifically related to the LIVE555 Streaming Media software.
+Where can I get more information?
+</h2>
+
+RTP/RTCP is standardized by the IETF's
+<a HREF="http://www.ietf.org/html.charters/avt-charter.html">Audio/Video Transport ("avt")</a>
+working group.
+In particular, note the
+<a HREF="ftp://ftp.rfc-editor.org/in-notes/rfc3550.txt">RTP/RTCP specification</a>.
+Also, an excellent book that covers RTP/RTCP in detail is
+"<a HREF="http://www.amazon.com/exec/obidos/tg/detail/-/0672322498/">RTP: Audio and Video for the Internet</a>"
+by Colin Perkins.
+<p>
+RTSP is standardized by the IETF's
+<a HREF="http://www.ietf.org/html.charters/mmusic-charter.html">Multiparty Multimedia Session Control ("mmusic")</a>
+working group.
+(For more information, see
+<a HREF="http://www.rtsp.org/">www.rtsp.org</a>)
+<p>
+SIP is standardized by the IETF's
+<a HREF="http://www.ietf.org/html.charters/sip-charter.html">Session Initiation Protocol ("sip")</a>
+and
+<a HREF="http://www.ietf.org/html.charters/sipping-charter.html">Session Initiation Proposal Investigation ("sipping")</a>
+working groups.
+(For more information, see
+<a HREF="http://www.cs.columbia.edu/~hgs/sip/">Henning Schulzrinne's site</a>.)
+
+<p><IMG  WIDTH="531" HEIGHT="6" SRC="../graphics/separator.gif" alt="-----"><p>
+
+<a name="mailing-list-address"></a><h2>
+How do I ask questions about the "LIVE555 Streaming Media" software (including the "LIVE555 Media Server" and "LIVE555 Proxy Server")?
+</h2>
+
+Support for the
+"<a HREF="./">LIVE555 Streaming Media" software</a>
+(including the
+"<a HREF="../mediaServer/">LIVE555 Media Server</a>"
+and
+"<a HREF="../proxyServer/">LIVE555 Proxy Server</a>")
+is handled via the
+<pre>
+        live-devel@lists.live555.com
+</pre>
+mailing list.
+Note, however, that before you can post to the mailing list, you must first
+<a HREF="http://lists.live555.com/mailman/listinfo/live-devel/">subscribe to it</a>.
+
+<p><hr><p><a name="why-subscribe"></a><h2>
+Why do I need to subscribe to the mailing list before I can post to it?
+</h2>
+
+This is standard for almost all Internet mailing lists.
+It helps protect against spam.
+
+<p><hr><p><a name="moderation"></a><h2>
+When I posted a message to the mailing list, I received a response saying that my message was being moderated.  Why?
+</h2>
+
+This provides additional protection against spam (because spammers have been known to occasionally forge the "From:" addresses
+in their messages).
+Everyone's first posting to the mailing list will be moderated before it gets sent to the list.
+Also, subscribers with unprofessional email addresses (see below) will have <em>all</em> of their postings moderated.
+
+<p><hr><p><a name="unprofessional-email-addresses"></a><h2>
+Why do you discriminate against people who use unprofessional email addresses ("@gmail.com" etc.)?
+</h2>
+
+Anyone can post questions to the mailing list.
+However, people's questions are taken more seriously (and are more likely to be answered)
+if they use a professional email address - i.e., one whose domain name identifies an organization (company or school)
+that they are affiliated with, or at least a personal custom domain name
+- <em>not</em> a public email service or 'portal'.
+<p>
+We use the domain name of posters' email addresses as a first-level filter when deciding which messages are worth responding to.
+If your only access to email is via a "@hotmail", "@gmail", "@aol" etc. -type address, then we assume
+(absent strong evidence to the contrary) that you lack the
+technical sophistication to use this software.
+Yes, this sounds harsh, but the hundreds of previous messages posted to the mailing list have borne this out.
+(Note that the underlying email <em>service</em> is not the problem;
+you can use your own domain name even with a public web-based email service.)
+<p>
+Once again, anyone can post to the mailing list (after they have subscribed to it),
+but questions posted from unprofessional email addresses will <em>always</em> be moderated and delayed,
+and are less likely to be answered.
+
+<p><hr><p><a name="why-no-answer"></a><h2>
+Why did nobody answer my question?
+</h2>
+
+Not every question that's posted to this mailing list will get answered.
+If nobody answers your question, then it might simply be because nobody knows the answer.
+This might be because your question was specific to your particular environment and/or application
+(which the rest of us may know little about).
+Or perhaps it was because you made modifications to the supplied library code.
+(This is frowned upon; the best way to extend the library code's functionality is via subclassing.)
+Or perhaps it was because your question can be answered by reading this FAQ.
+Or perhaps people did not find your question interesting enough to respond to.
+Or perhaps people did not find <em>you</em> interesting enough to respond to.
+(Remember that if you use an unprofessional ("@gmail.com" etc.) email address,
+you're advertising to the whole world that you're not particularly relevant.)
+
+<p><hr><p><a name="reposting"></a><h2>
+I posted a question to the mailing list, but nobody answered it.  Can I post it again?
+</h2>
+
+Absolutely not!  This is basic mailing list 'netiquette'.
+<p>
+Once your question is posted to the mailing list
+(you can check this by looking at the list's <a HREF="http://lists.live555.com/pipermail/live-devel/">archives</a>),
+then rest assured that hundreds of people will get to see it.
+But sometimes, a question does not get answered (see above).
+If that happens, then sorry - but <em>do not</em> send the question to the list again.
+
+<p><IMG  WIDTH="531" HEIGHT="6" SRC="../graphics/separator.gif" alt="-----"><p>
+
+<small>
+<br><a HREF="http://www.live555.com/">Live Networks, Inc. (LIVE555.COM)</a>
+</small>
+
+</body>
+</html>

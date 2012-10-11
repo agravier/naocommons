@@ -1,0 +1,776 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<Title>LIVE555 Streaming Media</Title>
+</head>
+
+<body background="../graphics/lni_background.jpg">
+
+<H1>
+LIVE555 Streaming Media
+</H1>
+
+This code forms a set of C++ libraries for multimedia streaming, using open standard
+protocols (RTP/RTCP, RTSP, SIP).
+These libraries - which can be compiled for
+Unix (including Linux and Mac OS X),
+Windows,
+and QNX (and other POSIX-compliant systems)
+- can be used to build streaming applications.
+The libraries are already being used to implement applications
+such as the
+"<a HREF="../mediaServer/">LIVE555 Media Server</a>"
+and
+"<a HREF="../proxyServer/">LIVE555 Proxy Server</a>"
+(RTSP server applications),
+"<a HREF="../liveCaster/">liveCaster</a>"
+and
+"<a HREF="../multikit/playRTPMPEG.html">playRTPMPEG</a>"
+(for streaming MP3 audio using RTP/RTCP),
+and
+"<a HREF="../vobStreamer/">vobStreamer</a>"
+(for streaming DVD content using RTP/RTCP/RTSP).
+The libraries can also be used to stream, receive, and process MPEG,
+H.264, H.263+, DV or JPEG video,
+and several audio codecs.
+They can easily be extended to support additional (audio and/or video) codecs,
+and can also be used to build basic
+<a HREF="../openRTSP/">RTSP</a>
+or
+<a HREF="../playSIP/">SIP</a>
+clients and servers,
+and have been used to add streaming support to existing media player
+applications, such as
+"<a HREF="http://www.videolan.org/vlc/">VLC</a>"
+and
+"<a HREF="../mplayer/">MPlayer</a>". 
+(For some specific examples of how these libraries can be used, see
+the <strong><a HREF="#testProgs">test programs</a></strong> below.)
+
+<h4>Source code</h4>
+The project source code is available
+- as a ".tar.gz" file -
+<a HREF="./public/">here</a>.
+See <a HREF="./#config-unix">below</a> for instructions on how to build it.
+
+<h4>Mailing list</h4>
+<a name="mailing-list"></a>
+There is a 
+<a HREF="http://www.live555.com/liveMedia/faq.html#mailing-list-address">developers' mailing list</a>: "live-devel@lists.live555.com".
+Users (or prospective users) of the libraries are encouraged to <a HREF="http://lists.live555.com/mailman/listinfo/live-devel/">join</a> this
+(low-volume) mailing list, and/or to review the
+mailing list's
+<a HREF="http://lists.live555.com/pipermail/live-devel/">archives</a>.
+(You can also search these archives using Google, by adding "site:lists.live555.com" to your search query.)
+<strong>
+Before posting to the mailing list for the first time, please read the
+<a HREF="./faq.html">FAQ<a/>, to check if your question has already been answered.
+</strong>
+
+<h4>Support</h4>
+The primary means of support for these libraries is the "live-devel@lists.live555.com" mailing list described above.
+(Note that you must first
+<a HREF="http://lists.live555.com/mailman/listinfo/live-devel/">subscribe</a>
+to the mailing list before you can post to it.)
+<!--
+In special cases, when the mailing list alone is not adequate,
+Live Networks Inc. can also act as a paid
+consultant to provide one-on-one assistance to
+customers who wish to use
+(or build upon) these libraries.
+If you're interested, please email "support<em>(at)</em>live555.com".
+-->
+
+<p>
+Are you planning to implement RTP
+(and/or RTSP or SIP)?
+Instead of writing your own implementation from scratch,
+consider using these libraries.
+They have already been used in many real-world RTP-based applications,
+and are well-suited for use within embedded systems.
+The code includes an implementation of RTCP, and can
+easily be extended (via subclassing) to support new RTP
+payload types.
+<p><IMG  WIDTH="531" HEIGHT="6" SRC="../graphics/separator.gif" alt="-----"><p>
+
+<ol>
+<li><a HREF="#description">Description</a>
+(including <strong><a HREF="#testProgs">test programs</a></strong>)
+<li><a HREF="#config-unix">How to configure and build the code on Unix
+<small>(including Linux, Mac OS X, QNX,
+and other Posix-compliant systems)</small>
+</a>
+<li><a HREF="#config-windows">How to configure and build the code on Windows</a>
+<li><strong><a HREF="./faq.html">Frequently Asked Questions (FAQ)</a></strong>.
+(<strong>Please read this before posting questions to the mailing list.</strong>)
+<li><a HREF="#license">Source code license</a>
+<li><a HREF="#todo">To do...</a>
+<li><a HREF="#3rd-party-apps">Some third-party applications</a>
+</ol>
+
+<p><IMG  WIDTH="531" HEIGHT="6" SRC="../graphics/separator.gif" alt="-----"><p>
+<a name="description"></a>
+<h2>Description</h2> 
+
+The code includes the following libraries, each with its own subdirectory:
+
+<p><hr><p>
+<h3>UsageEnvironment</h3>
+The "<a HREF="./doxygen/html/classUsageEnvironment.html">UsageEnvironment</a>"
+and
+"<a HREF="./doxygen/html/classTaskScheduler.html">TaskScheduler</a>" classes
+are used for scheduling deferred events,
+for assigning handlers for asynchronous read events,
+and for outputting error/warning messages.
+Also, the "<a HREF="./doxygen/html/classHashTable.html">HashTable</a>" class
+defines the interface to a generic hash table,
+used by the rest of the code.
+<p>
+These are all abstract base classes;
+they must be subclassed for use in an
+implementation.
+These subclasses can exploit the particular properties of
+the environment in which the program will run
+- e.g., its GUI and/or scripting environment.
+
+<p><hr><p>
+<h3>groupsock</h3>
+The classes in this library encapsulate network interfaces
+and sockets.
+In particular, the "<a HREF="./doxygen/html/classGroupsock.html">Groupsock</a>" class
+encapsulates
+a socket for sending
+(and/or receiving) multicast datagrams.
+
+<p><hr><p>
+<h3>liveMedia</h3>
+This library defines a class hierarchy
+- rooted in the "<a HREF="./doxygen/html/classMedium.html">Medium</a>" class -
+for a variety of streaming media types and codecs.
+
+<p><hr><p>
+<h3>BasicUsageEnvironment</h3>
+This library defines
+<a HREF="./doxygen/html/classBasicUsageEnvironment.html">one concrete implementation</a>
+(i.e., subclasses)
+of the "UsageEnvironment" classes,
+for use in simple, console applications.
+Read events and delayed operations
+are handled using a select() loop.
+
+<p><hr><p>
+<a name="testProgs"></a><h3>testProgs</h3>
+This directory implements some simple programs
+that use "BasicUsageEnvironment" to demonstrate how 
+to develop applications using these libraries.
+
+<h4><strong>RTSP client</strong></h4>
+<ul>
+<li><strong>testRTSPClient</strong>
+is a command-line program that shows you how to open and receive media streams that are specified
+by a RTSP URL - i.e., an URL that begins with
+<em>rtsp://</em>
+<p>
+In this demonstration application, nothing is done with the received audio/video data.
+You could, however, use and adapt this code in your own application to (for example) decode and play the received data.
+<li><strong><a HREF="../openRTSP/">openRTSP</a></strong>
+is similar to "testRTSPClient", but has many more features.
+It is a command-line program that - unlike "testRTSPClient" - is intended to be used as a complete, full-featured application
+(rather than having its code used within other applications).
+For more information about "openRTSP" - including its many command-line options - see
+<a HREF="../openRTSP/">the online documentation</a>.
+</ul>
+
+<h4><strong>RTSP server</strong></h4>
+<ul>
+<li><strong>testOnDemandRTSPServer</strong>
+creates a RTSP server that can stream, via RTP unicast,
+from various types of media file, on demand.
+(Supported media types include:
+MPEG-1 or 2 audio or video (elementary stream),
+including MP3 audio;
+MPEG-4 video (elementary stream);
+H.264 video (elementary stream);
+MPEG Program or Transport streams, including VOB files;
+DV video;
+AMR audio;
+WAV (PCM) audio.)
+The server can also stream from a
+<a HREF="http://matroska.org/">Matroska</a>
+or
+<a HREF="http://www.webmproject.org/">WebM</a>
+file
+(by demultiplexing and streaming the tracks within the file).
+MPEG Transport Streams can also be streamed over raw UDP, if requested
+- e.g., by a set-top box.
+<small>
+      <ul>
+      <li>This server application also demonstrates how to deliver - via RTSP - a MPEG Transport Stream that arrived at the server
+      as a UDP (raw-UDP or RTP/UDP) multicast or unicast stream.  In particular, it is set up, by default, to accept input from the 
+      "testMPEG2TransportStreamer" demo application.
+      </ul>
+</small>
+</ul>
+
+<h4><strong>SIP client</strong></h4>
+<ul>
+<li><strong><a HREF="../playSIP/">playSIP</a></strong>
+is a command-line program
+(similar to "openRTSP")
+that makes a call to a SIP session (using a
+<em>sip:</em> URL),
+and then (optionally)
+records the incoming media stream into a file.
+</ul>
+
+<h4><strong>MP3 audio</strong> test programs</h4>
+<ul>
+<li><strong>testMP3Streamer</strong> repeatedly reads from a MP3 audio file
+(named "test.mp3"), and streams it, using RTP, to the multicast group
+239.255.42.42, port 6666
+(with RTCP using port 6667).
+This program also has an (optional) built-in RTSP server.
+
+<li><strong>testMP3Receiver</strong> does the reverse: It reads a MP3/RTP stream
+(from the same multicast group/port), and outputs the reconstituted
+MP3 stream to "stdout".
+It also sends RTCP Reception Reports.
+<small>
+      <ul>
+      <li>Alternatively, the MP3/RTP stream could be played using 
+  one of <a HREF="../liveCaster/receiving.html">these tools</a>.
+      </ul>
+</small>
+</ul>
+
+<h4><strong>MPEG video</strong> test programs</h4>
+<ul>
+<li><strong>testMPEG1or2VideoStreamer</strong> repeatedly reads from a
+MPEG-1 or 2 video file
+(named "test.mpg"), and streams it, using RTP, to the multicast group
+239.255.42.42, port 8888
+(with RTCP using port 8889).
+This program also has an (optional) built-in RTSP server.
+<small>
+<ul>
+<li>By default, the input file is assumed to be a MPEG Video Elementary Stream.
+If, however, it is a MPEG Program Stream, then you can also insert a
+demultiplexing filter to extract the Video Elementary Stream.
+(See "testMPEG1or2VideoStreamer.cpp" for details.)
+<li>Apple's "<a HREF="http://www.apple.com/quicktime/download/">QuickTime Player</a>" can be used to receive and view this streamed video
+(provided that it's MPEG-1, not MPEG-2).
+To use this, have QuickTime Player open the file "testMPEG1or2Video.sdp".
+(If "testMPEG1or2VideoStreamer's" RTSP server has been enabled, then
+QuickTime Player can also play the stream using a "rtsp://" URL.) 
+<li>The Open Source
+"<a HREF="http://www.videolan.org/vlc/">VLC</a>"
+and
+"<a HREF="../mplayer/">MPlayer</a>" media players
+can also be used. 
+<li>RealNetworks' "<a HREF="http://www.real.com/">RealPlayer</a>"
+can also be used to play the stream.  (A recent version is recommended.)
+</ul>
+</small>
+
+<li><strong>testMPEG1or2VideoReceiver</strong> 
+does the reverse: It reads a MPEG Video/RTP stream
+(from the same multicast group/port), and outputs the reconstituted
+MPEG video (elementary) stream to "stdout".
+It also sends RTCP Reception Reports.
+
+<li><strong>testMPEG4VideoStreamer</strong> repeatedly reads from a MPEG-4
+Elementary Stream video file (named "test.m4e"), and streams it using RTP
+multicast.
+This program also has a built-in RTSP server.
+<small>
+<ul>
+<li>Apple's "<a HREF="http://www.apple.com/quicktime/download/">QuickTime Player</a>"
+can be used to receive and play this audio stream.
+To use this, have the player open the session's "rtsp://" URL
+(which the program prints out as it starts streaming).
+<li>The Open Source
+"<a HREF="http://www.videolan.org/vlc/">VLC</a>"
+and
+"<a HREF="../mplayer/">MPlayer</a>" media players
+can also be used. 
+</ul>
+</small>
+
+<li><strong>testH264VideoStreamer</strong> repeatedly reads from a H.264
+Elementary Stream video file (named "test.264"), and streams it using RTP
+multicast.
+This program also has a built-in RTSP server.
+<small>
+<ul>
+<li>Apple's "<a HREF="http://www.apple.com/quicktime/download/">QuickTime Player</a>"
+can be used to receive and play this audio stream.
+To use this, have the player open the session's "rtsp://" URL
+(which the program prints out as it starts streaming).
+<li>The Open Source
+"<a HREF="http://www.videolan.org/vlc/">VLC</a>"
+and
+"<a HREF="../mplayer/">MPlayer</a>" media players
+can also be used. 
+</ul>
+</small>
+</ul>
+
+<h4><strong>MPEG audio+video (Program Stream)</strong> test programs</h4>
+<ul>
+<li><strong>testMPEG1or2AudioVideoStreamer</strong>
+reads a MPEG-1 or 2 Program Stream file
+(named "test.mpg"), extracts from this an audio and a video
+Elementary Stream, and streams these, using RTP, to the multicast
+group
+239.255.42.42, port 6666/6667 (for the audio stream)
+and 8888/8889 (for the video stream).
+This program also has an (optional) built-in RTSP server.
+<small>
+<ul>
+<li>Apple's "<a HREF="http://www.apple.com/quicktime/download/">QuickTime Player</a>" can be used to receive and view this streamed video
+(provided that it's MPEG-1, not MPEG-2).
+To use this, have QuickTime Player open the file "testMPEG1or2AudioVideo.sdp".
+(If "testMPEG1or2VideoStreamer's" RTSP server has been enabled, then
+QuickTime Player can also play the stream using a "rtsp://" URL.) 
+<li>The Open Source
+"<a HREF="http://www.videolan.org/vlc/">VLC</a>"
+and
+"<a HREF="../mplayer/">MPlayer</a>" media players
+can also be used. 
+<!--
+<li>RealNetworks' "<a HREF="http://www.real.com/">RealPlayer</a>"
+can also be used to play the stream.  (A recent version is recommended.)
+-->
+</ul>
+</small>
+<li><strong>testMPEG1or2Splitter</strong>
+reads a MPEG-1 or 2 Program Stream file
+(named "in.mpg"), and extracts from this an audio and a video
+Elementary Stream.  These two Elementary Streams are written into files named
+"out_audio.mpg" and "out_video.mpg" respectively.
+</ul>
+
+<h4><strong>MPEG audio+video (Transport Stream)</strong> test programs</h4>
+<ul>
+<li><strong>testMPEG2TransportStreamer</strong>
+reads a MPEG Transport Stream file
+(named "test.ts"), and streams it, using RTP, to the multicast
+group
+239.255.42.42, port 1234 (with RTCP using port 1235).
+This program also has an (optional) built-in RTSP server.
+<small>
+<ul>
+<li>The Open Source
+"<a HREF="http://www.videolan.org/vlc/">VLC</a>"
+media player
+can be used to play this stream.
+<!--
+<li>RealNetworks' "<a HREF="http://www.real.com/">RealPlayer</a>"
+can also be used to play the stream.  (A recent version is recommended.)
+-->
+</ul>
+</small>
+<li><strong>testMPEG2TransportReceiver</strong> 
+does the reverse: It reads a MPEG Transport/RTP stream
+(from the same multicast group/port), and outputs the reconstituted
+MPEG Transport Stream stream to "stdout".
+It also sends RTCP Reception Reports.
+
+<li><strong>testMPEG1or2ProgramToTransportStream</strong>
+reads a MPEG-1 or 2 Program Stream file
+(named "in.mpg"), and converts it to an equivalent
+MPEG Transport Stream file,
+named "out.ts".
+<li><strong>testH264VideoToTransportStream</strong>
+reads a H.264 Video Elementary Stream file
+(named "in.264"), and converts it to an equivalent
+MPEG Transport Stream file,
+named "out.ts".
+</ul>
+
+<h4><strong>PCM audio</strong> test programs</h4>
+<ul>
+<li><strong>testWAVAudioStreamer</strong> reads from a WAV-format audio
+file (named "test.wav"), and streams the enclosed PCM audio stream via
+IP multicast, using a built-in RTSP server.
+<small>
+<ul>
+<li>The program supports 8 or 16-bit PCM streams, mono or stereo, at any
+sampling frequency.
+<li>Apple's "<a HREF="http://www.apple.com/quicktime/download/">QuickTime Player</a>"
+can be used to receive and play this audio stream.
+To use this, have the player open the session's "rtsp://" URL
+(which the program prints out as it starts streaming).
+<li>Optionally, 16-bit PCM streams can be converted to 8-bit u-law format
+prior to streaming.
+(See "testWAVAudioStreamer.cpp" for instructions on how to do this.) 
+<li>The Open Source
+"<a HREF="http://www.videolan.org/vlc/">VLC</a>"
+and
+"<a HREF="../mplayer/">MPlayer</a>" media players
+can also be used. 
+</ul>
+</small>
+</ul>
+
+<h4><strong>AMR audio</strong> test programs</h4>
+<ul>
+<li><strong>testAMRAudioStreamer</strong> reads from a AMR-format audio
+file (named "test.amr") - as defined in RFC 3267, section 5 - and streams
+the enclosed audio stream via IP multicast, using a built-in RTSP server.
+<small>
+<ul>
+<li>Apple's "<a HREF="http://www.apple.com/quicktime/download/">QuickTime Player</a>"
+can be used to receive and play this audio stream.
+<!--
+provided that you have also installed the
+<a HREF="http://www.apple.com/quicktime/download/3gpp/">QuickTime 3GPP component</a>.
+-->
+To use this, have the player open the session's "rtsp://" URL
+(which the program prints out as it starts streaming).
+</ul>
+</small>
+</ul>
+
+<h4><strong>DV video</strong> test program</h4>
+<ul>
+<li><strong>testDVVideoStreamer</strong> reads from a DV video
+file (named "test.dv"), and streams it
+via IP multicast, using a built-in RTSP server.
+<small>
+<ul>
+<li>At present, we know of no widely-available media player client that can
+play this stream.
+</small>
+</ul>
+</ul>
+
+<h4><strong>VOB (DVD)</strong> streaming test program</h4>
+<ul>
+<li><strong><a HREF="../vobStreamer/">vobStreamer</a></strong>
+reads one or more ".vob" files (e.g., from a DVD),
+extracts the audio and video streams,
+and transmits them using RTP multicast.
+</ul>
+
+<h4>Support for server 'trick play' operations on MPEG Transport Stream files</h4>
+<ul>
+<li>The applications
+<a HREF="./transport-stream-trick-play.html">
+<strong>MPEG2TransportStreamIndexer</strong>
+and
+<strong>testMPEG2TransportStreamTrickPlay</strong>
+</a>
+</ul>
+
+<!--
+<h4><strong>Darwin Streaming Server injection</strong> test programs</h4>
+These test programs
+use the liveMedia
+"<a HREF="./doxygen/html/classDarwinInjector.html">DarwinInjector</a>" class to
+stream audio and/or video into a remote Apple
+"<a HREF="http://developer.apple.com/darwin/projects/streaming/">Darwin Streaming Server</a>"
+(aka. "<a HREF="http://www.apple.com/quicktime/products/qtss/">QuickTime Streaming Server</a>"),
+for playing by (potentially multiple) RTSP clients.
+In other words, these applications, rather than having their own built-in
+RTSP server (like most of the applications noted earlier), use a separate RTSP server (a Darwin Streaming Server) to serve clients.
+(Note that these programs require that you have write access to the
+Darwin Streaming Server.)
+<ul>
+<li><strong>testMPEG1or2AudioVideoToDarwin</strong>
+repeatedly reads a MPEG-1 or 2 Program Stream file
+(named "test.mpg"), extracts from this an audio and a video
+Elementary Stream, and streams these, using RTP, to 
+a specified Darwin Streaming Server,
+using the session name "test.sdp".
+<li><strong>testMPEG4VideoToDarwin</strong> repeatedly reads from a MPEG-4
+Elementary Stream video file (named "test.m4e"), and streams it, using RTP, to
+a specified Darwin Streaming Server,
+using the session name "test.sdp".
+</ul>
+-->
+
+<h4><strong>Miscellaneous</strong> test programs</h4>
+<ul>
+<li><strong>testRelay</strong> repeatedly reads from a UDP multicast socket,
+and retransmits ('relays')
+each packet's payload to a new (multicast or unicast) address and port.
+<li><strong>testReplicator</strong> is similar to <strong>testRelay</strong>,
+except that it replicates the input stream
+- using the "FrameReplicator" class -
+and retransmits one replica stream to another (multicast or unicast) address and port,
+while writing the other replica stream to a file.
+<li><strong>sapWatch</strong> reads and prints SDP/SAP announcements
+made on the default SDP/SAP directory (224.2.127.254/9875)
+</ul>
+
+<p><hr><p>
+<a name="WindowsAudioInputDevice"></a><h3>WindowsAudioInputDevice</h3>
+This is an implementation of the "liveMedia" library's
+"AudioInputDevice" abstract class.
+This can be used by a Windows application to read PCM audio samples from
+an input device.
+<p>
+<small>
+(This project builds two libraries:
+"libWindowsAudioInputDevice_mixer.lib",
+which uses Windows' built-in mixer, and
+"libWindowsAudioInputDevice_noMixer.lib", which doesn't.)
+</small>
+
+<p><IMG  WIDTH="531" HEIGHT="6" SRC="../graphics/separator.gif" alt="-----"><p>
+<a name="config-unix"></a>
+<h2>How to configure and build the code on Unix
+<small>(including Linux, Mac OS X, QNX,
+and other Posix-compliant systems)</small>
+</h2>
+The source code package can be found
+(as a ".tar.gz" file)
+<a HREF="./public/">here</a>.
+Use "tar -x" and "gunzip" (or "tar -xz", if available)
+to extract the package; then cd to the "live" directory.
+Then run
+<pre>
+    ./genMakefiles &lt;os-platform&gt;
+</pre>
+where <em>&lt;os-platform&gt;</em> is your target platform
+- e.g., "linux" or "solaris" - 
+defined by a "config.<em>&lt;os-platform&gt;</em>" file.
+This will generate a Makefile in the "live" directory
+and each subdirectory.
+Then run "make".
+<ul>
+<li>If the "make" fails, you may need to make small modifications to the
+appropriate
+"config.<em>&lt;os-platform&gt;</em>" file,
+and then re-run "genMakefiles <em>&lt;os-platform&gt;</em>".
+(E.g., you may need to add another
+"-I<em>&lt;dir&gt;</em>" flag to the
+COMPILE_OPTS definition.)
+
+<li>Some people (in particular, FreeBSD users)
+have reported that the
+<a HREF="http://www.gnu.org/software/make/">GNU version of "make"</a>
+- often called "gmake" - 
+works better than their default, pre-installed version of "make".
+(In particular, you should try using "gmake" if you encounter linking problems with the "ar" command.)
+
+<li><strong>If you're using "gcc" version 3.0 or greater:</strong>
+You may also wish to
+add the <em>-Wno-deprecated</em> flag to CPLUSPLUS_FLAGS.
+
+<li>If no "config.<em>&lt;os-platform&gt;</em>" file exists for
+your target platform,
+then try using one of the existing files as a template.
+</ul>
+
+There's no official 'install' procedure; you can put the 
+"live/" directory wherever you wish
+- but you must leave the directory structure intact.
+You may wish to do the following:
+<pre>
+    rm -rf /usr/local/lib/live ; cp -r live /usr/local/lib
+</pre>
+Alternatively, you could copy just the library binary files.
+
+<p><IMG  WIDTH="531" HEIGHT="6" SRC="../graphics/separator.gif" alt="-----"><p>
+<a name="config-windows"></a>
+<h2>How to configure and build the code on Windows</h2>
+<ol>
+<li>Unpack and extract the '.tar.gz' file
+(using an application such as "WinZip").
+<li>If the 'tools' directory on your Windows machine is something
+<em>other than</em> "c:\Program Files\DevStudio\Vc", change the "TOOLS32 =" line in the file
+"win32config".
+<li>In a command shell, 'cd' to the "live" directory, and run
+<pre>
+    genWindowsMakefiles
+</pre>
+</ol>
+This will generate - in each subdirectory - a "*.mak" makefile
+suitable for use by (e.g.) Microsoft Visual Studio.
+<p>
+<small>
+<ul>
+<li>Alternatively, if you're starting from a Unix machine, you can generate the Windows
+Makefiles by running
+<pre>
+    ./genWindowsMakefiles
+</pre>
+(after - if necessary - changing the "TOOLS32 =" line in the file "win32config", as noted above).
+Then, copy the "live" directories and its subdirectories (in ASCII mode) to a Windows machine.
+<li>To use these Makefiles from within Visual Studio, use the "Open Workspace"
+menu command, then (in the file selection dialog)
+for "Files of type", choose "Makefiles (.mak)".
+Visual Studio should then prompt you, asking if you want to use this 
+Makefile to set up a new project.
+Say "OK".
+<li>Note that you will need to build each of the
+"UsageEnvironment",
+"groupsock",
+"liveMedia",
+and
+"BasicUsageEnvironment"
+projects <em>first</em>,
+before building
+"testProgs".
+<li>If you wish, you can build the
+"WindowsAudioInputDevice" project also.
+<li>Doug Kosovic notes:
+<small>
+Visual C++ 2003 no longer comes with the old I/O Streams headers
+iostreams.h et al, or the corresponding library msvcirt.lib. So anybody
+trying to build the LIVE555 code with VC++ 2003 might find the
+following useful:
+A non-sourcecode modification workaround for VC++ 2003 is to copy the
+missing headers and msvcirt.lib from VC++ 2002. In file 'win32config'
+add an extra -I switch to COMPILE_OPTS to find the old headers and a
+-LIBPATH: switch to LINK_OPTS_0 to find msvcirt.lib.
+</small>
+<!--
+<li>Eric Flickner contributes some
+<a HREF="http://letsgoustc.spaces.live.com/blog/cns!89AD27DFB5E249BA!167.entry">hints</a>
+for compiling the code under Visual Studio 2005.
+-->
+</ul>
+</small>
+
+<a name="borland"></a>
+<h3>If you're using the Borland C++ compiler</h3>
+The instructions above assume that you use Microsoft Visual Studio
+(version 5 or greater) as your C++ development environment.
+If, however, you are using Borland's development tools, then the
+instructions above are amended as follows:
+<ol>
+<li>Before running the "genWindowsMakefiles.cmd" script, edit it
+to replace each
+occurrence of "win32config" with "win32config.Borland".
+<li>After running "genWindowsMakefiles", edit each of the new Makefiles
+by following
+<a HREF="./borland-additional-instructions.txt">these instructions</a>.
+</ol>
+
+<p><IMG  WIDTH="531" HEIGHT="6" SRC="../graphics/separator.gif" alt="-----"><p>
+<h2><a HREF="./faq.html">Frequently Asked Questions (FAQ)</a></h2>
+(Please read this before posting questions to the mailing list.)
+
+<p><IMG  WIDTH="531" HEIGHT="6" SRC="../graphics/separator.gif" alt="-----"><p>
+<a name="license"></a>
+<h2>Source code license</h2>
+
+This code is "open source", and is released under the
+<a href="http://www.gnu.org/copyleft/lesser.html">LGPL</a>.
+This allows you to use these libraries (via linking)
+inside closed-source products.
+It also allows you to make closed-source 
+binary extensions to these libraries
+- for instance, to support
+proprietary media codecs that subclass the existing "liveMedia"
+class hierarchy.
+Nonetheless,
+we hope that subclass extensions of these libraries
+will also be developed under the LGPL,
+and contributed for inclusion here.
+We encourage developers to contribute to the development
+and enhancement of these libraries.
+<p>
+
+<p><IMG  WIDTH="531" HEIGHT="6" SRC="../graphics/separator.gif" alt="-----"><p>
+<a name="todo"></a>
+<h2>To do...</h2>
+<ul>
+<li>Extend the "liveMedia" library to support even
+more media types and/or codecs.
+<li>Supply additional "UsageEnvironment" subclassed implementations
+- e.g., for use with scripted environments, such as Tcl, Python, or Perl.
+<li>Expand the RTCP implementation to support more SDES items (other than just CNAME), and to more completely handle incoming RTCP packets.
+<li>In places the code uses data types such as "unsigned", where
+instead specific lengths (e.g., 32 bits) are required.  The data types should
+be changed in each such case.
+<li>Fix the "groupsock" implementation so that it could use IPv6 instead
+of IPv4.
+(At present, 4-byte addresses are hard-wired into the code in several places.)
+<li>Switch to using ISO-conformant C++ headers
+(but in such a way that the
+code can remain portable across both Unix (using gcc) and Windows
+(using Visual C++)).
+<li>Implement network sockets ("groupsock"s) as "liveMedia" 'sources'.
+This will make the code for RTP sources more consistent with the rest of the
+"liveMedia" library, allowing them to be "FramedFilters".
+(This will make it possible to use synthetic network sockets - e.g., for
+debugging or simulation.)
+<li>Add support for SRTP ('secure' RTP), and perhaps also RTSP-over-TLS.
+<!--
+<li>Improve "ByteStreamFileSource" so that it uses "iostream"s.
+This will allow readers to use iostream operations (such as "<<").
+-->
+</ul>
+
+<p><IMG  WIDTH="531" HEIGHT="6" SRC="../graphics/separator.gif" alt="-----"><p>
+<a name="3rd-party-apps"></a>
+<h2>Some third-party applications</h2>
+
+Several third-party devices and applications have made use of the
+LIVE555 Streaming Media Software.  Here is a list of some of them:
+
+<h3>Hardware</h3>
+<ul>
+<li><a HREF="http://www.wischip.com/">WIS Technologies</a> media encoders.
+(The "<a HREF="../wis-streamer/">wis-streamer</a>" server application
+- for Linux - can be used to stream from many of these encoders.)
+<li>Elphel <a HREF="http://www.elphel.com/">Network Video Cameras</a>
+(with optional
+<a HREF="../Elphel/">JPEG streaming over RTP</a>).
+<li>Network-enabled, RTP-streaming <a HREF="http://www.drayvision.com/">Security Cameras</a>,
+from RVision
+<li>The <a HREF="http://www.linuxmedialabs.com/product_details.php?prodid=105">"LMLM4" MPEG-4 audio/video hardware encoder PCI board</a>,
+from Linux Media Labs.
+<small>
+(A "LIVE555 Streaming Media" software interface to this hardware is
+available from Live Networks, Inc.  For more information,
+please email "support<em>(at)</em>live555.com".)
+</small>
+<li>The "<a HREF="http://cam.ly/">Cam.ly</a>" wireless security camera system uses
+"<a HREF="../openRTSP/">openRTSP</a>"
+to archive recorded video.
+</ul>
+
+<h3>Software</h3>
+<ul>
+<li>The "<a HREF="http://www.videolan.org/vlc/">VLC</a>" media player (uses the "LIVE555 Streaming Media" libraries for its RTSP client implementation).
+<li>The "<a HREF="http://www.hustmobile.com/goodplayer/">GoodPlayer</a> media player app for iOS (iPhones and iPads).
+(This app uses VLC's library for rendering, and the "LIVE555 Streaming Media" libraries for a RTSP client.)
+<li>The "<a HREF="http://www.mplayerhq.hu/">MPlayer</a> media player.
+<!--
+<br>
+<small>
+(See <a HREF="../mplayer/">here</a> for instructions for
+building this with the LIVE555 Streaming Media code, for playing RTSP/RTP streams.)
+</small>
+-->
+<li>"<a HREF="http://www.morgan-multimedia.com/RTP/">Morgan RTP DirectShow<sup><font size=-2>TM</font></sup> Filters</a>", from
+<a HREF="http://www.morgan-multimedia.com/">Morgan Multimedia</a>
+<li>"<a HREF="http://omnimeeting.sourceforge.net/">Omnimeeting</a>" - a videoconferencing application
+<!--
+<li>"<a HREF="http://darkwing.uoregon.edu/~tkay/mim.html">mimd</a>"
+(a MPEG multicast streaming application),
+from 
+<a HREF="http://videolab.uoregon.edu/">The University of Oregon</a>
+-->
+<li>"<a HREF="http://freshmeat.net/projects/nmm/?topic_id=809%2C99">Network-Integrated Multimedia Middleware (NMM)</a>", from <a HREF="http://www.uni-saarland.de/">Saarland University</a>
+<li>The "<a HREF="https://www.dropcam.com/">DropCam</a>" iOS (i.e., iPhone/iPad) stream viewing application.
+<li>"<a HREF="http://code.google.com/p/altalena/">ivrworx"</a> - a SIP IVR application - uses "LIVE555 Streaming Media" code for
+RTP mixing
+</ul>
+
+If you would like your product (or project) added to this list, please
+send email to <a HREF="http://lists.live555.com/mailman/listinfo/live-devel/">the developers' mailing list</a>.
+
+<p><IMG  WIDTH="531" HEIGHT="6" SRC="../graphics/separator.gif" alt="-----"><p>
+<p><a href="http://www.digitalpoint.com/tools/geovisitors/"><img src="http://geo.digitalpoint.com/a.png" alt="Geo Visitors Map" style="border:0"></a>
+<small>
+<p><a HREF="http://www.live555.com/">Live Networks, Inc. (LIVE555.COM)</a>
+</small>
+</body>
+</html>
